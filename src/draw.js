@@ -50,9 +50,9 @@ class GPUProg {
 				}
 			}
 
-			this.frag = drawWebGL2.shaders[progInfo.vs.name];
+			this.frag = drawWebGL2.shaders[progInfo.fs.name];
 			if (this.frag == null) {
-				this.frag = compileVertShader(progInfo.fs.src)
+				this.frag = compileFragShader(progInfo.fs.src)
 				if (this.frag) {
 					drawWebGL2.shaders[progInfo.fs.name] = this.frag;
 				}
@@ -70,8 +70,6 @@ class GPUProg {
 						gl.deleteProgram(this.prog);
 						this.prog = null;
 					} else {
-						this.vert = vs;
-						this.frag = fs;
 						this.nattr = progInfo.attrs.length;
 						this.nparm = progInfo.uniforms.length;
 						this.nsamp = progInfo.samplers.length;
@@ -80,11 +78,11 @@ class GPUProg {
 							this[`locAttr${attr}`] = gl.getAttribLocation(this.prog, `vtx${attr}`);
 						}
 
-						for (const parm in progInfo.uniforms) {
+						for (const parm of progInfo.uniforms) {
 							this[`parmLoc${parm}`] = gl.getUniformLocation(this.prog, `prm${parm}`);
 						}
 
-						for (const samp in progInfo.samplers) {
+						for (const samp of progInfo.samplers) {
 							this[`sampLoc${samp}`] = gl.getUniformLocation(this.prog, `smp${samp}`);
 						}
 
