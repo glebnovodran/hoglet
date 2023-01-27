@@ -1,18 +1,20 @@
+#version 300 es
+
 precision highp float;
 
-varying vec3 pixPos;
-varying vec3 pixNrm;
-varying vec3 pixRGB;
-varying vec2 pixTex;
+in vec3 pixPos;
+in vec3 pixNrm;
+in vec3 pixRGB;
+in vec2 pixTex;
+
+out vec4 outClr;
 
 uniform vec3 prmBaseColor;
 
-uniform sampler2D smpBase;
+//uniform sampler2D smpBase;
 
 void main() {
-	vec4 tex = texture2D(smpBase, pixTex);
-	tex.rgb *= prmBaseColor;
-	vec3 clr = tex.rgb * pixRGB;
-	gl_FragColor = vec4(clr, tex.a);
+	vec3 clr = pixRGB * prmBaseColor;
+	outClr = vec4(clr, 1.0f);
 }
 

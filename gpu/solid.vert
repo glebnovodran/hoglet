@@ -1,17 +1,19 @@
+#version 300 es
+
 precision highp float;
 
-attribute vec3 vtxPos;
-attribute vec3 vtxNrm;
-attribute vec3 vtxRGB;
-attribute vec2 vtxTex;
+in vec3 vtxPos;
+in vec3 vtxNrm;
+in vec3 vtxRGB;
+in vec2 vtxTex;
 
 uniform mat4 prmWorld;
 uniform mat4 prmViewProj;
 
-varying vec3 pixPos;
-varying vec3 pixNrm;
-varying vec3 pixRGB;
-varying vec2 pixTex;
+out vec3 pixPos;
+out vec3 pixNrm;
+out vec3 pixRGB;
+out vec2 pixTex;
 
 void main() {
 	mat4 wm = prmWorld;
