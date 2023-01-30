@@ -71,23 +71,21 @@ class GPUProg {
 						this.prog = null;
 					} else {
 						this.nattr = progInfo.attrs.length;
-						this.nparm = progInfo.uniforms.length;
+						this.nparm = progInfo.gpblocks.length;
 						this.nsamp = progInfo.samplers.length;
 
 						for (const attr of progInfo.attrs) {
 							this[`locAttr${attr}`] = gl.getAttribLocation(this.prog, `vtx${attr}`);
 						}
 
-						for (const parm of progInfo.uniforms) {
-							this[`parmLoc${parm}`] = gl.getUniformLocation(this.prog, `prm${parm}`);
+						for (const gpblock of progInfo.gpblocks) {
+							this[`gpLoc${gpblock}`] = gl.getUniformBlockIndex(this.prog, `GP${gpblock}`);
 						}
 
 						for (const samp of progInfo.samplers) {
 							this[`sampLoc${samp}`] = gl.getUniformLocation(this.prog, `smp${samp}`);
 						}
-
 					}
-
 				}
 			}
 

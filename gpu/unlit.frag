@@ -9,9 +9,9 @@ in vec2 pixTex;
 
 out vec4 outClr;
 
-uniform vec3 prmBaseColor;
-
-//uniform sampler2D smpBase;
+layout(std140) uniform GPModel { 
+	vec3 prmBaseColor;
+};
 
 void main() {
 	vec3 clr = pixRGB * prmBaseColor;
