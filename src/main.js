@@ -16,5 +16,6 @@ function demo_start() {
 function main() {
 	console.clear();
 	drawWebGL2.init("webgl2_canvas");
+	scene.init([{name :"box", str : json_box}]);
 	demo_start();
 }
