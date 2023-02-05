@@ -22,7 +22,7 @@ class Model {
 		this.nmtl = jsonObj.nmtl;
 		this.hasSkin = false;
 
-		const vbufData = this.getVBData(jsonObj);
+		const vbufData = Model.getVBData(jsonObj);
 
 		const mtlTriCnt = new Uint16Array(this.nmtl);
 		mtlTriCnt.fill(0);
@@ -77,7 +77,7 @@ class Model {
 
 	}
 
-	getVBData(jsonObj) {
+	static getVBData(jsonObj) {
 		let attrOffsMap = {
 			"N" : {"offs" : -1, "sz" : 3},
 			"Cd" : {"offs" : -1, "sz" : 3},
