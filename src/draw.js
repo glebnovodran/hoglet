@@ -26,9 +26,20 @@ function compileFragShader(src) {
 	return compileShader(src, gl.FRAGMENT_SHADER);
 }
 
-function validAttr(location) {
+function validAttrib(location) {
 	return (typeof location === "number") && (location >= 0);
 }
+
+function setVtxAttrib(loc, nelems, stride, offs) {
+	const gl = drawWebGL2.gl;
+	if (validAttrib(loc)) {
+		gl.enableVertexAttribArray(loc);
+		gl.vertexAttribPointer(loc, nelems, gl.FLOAT, false, stride, offs);
+	}
+	return offs + nelems*4;
+}
+
+
 
 class GPUProg {
 	constructor(progInfo) {
@@ -75,7 +86,7 @@ class GPUProg {
 						this.nsamp = progInfo.samplers.length;
 
 						for (const attr of progInfo.attrs) {
-							this[`locAttr${attr}`] = gl.getAttribLocation(this.prog, `vtx${attr}`);
+							this[`attrLoc${attr}`] = gl.getAttribLocation(this.prog, `vtx${attr}`);
 						}
 
 						for (const gpblock of progInfo.gpblocks) {
