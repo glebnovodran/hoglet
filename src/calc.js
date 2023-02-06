@@ -24,7 +24,7 @@ class Vec3 {
 	}
 
 	zero() {
-		return (this.set(0.0, 0.0, 0.0));
+		return (this.el.fill(0.0));
 	}
 
 	static zero() {
