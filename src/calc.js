@@ -169,4 +169,8 @@ class Vec3 {
 	static cross(v0, v1) {
 		return (new Vec3()).cross(v0, v1);
 	}
+
+	print() {
+		console.log(`[${this.x}. ${this.y}, ${this.z}]`);
+	}
 }
