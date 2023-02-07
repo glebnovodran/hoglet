@@ -33,15 +33,15 @@ class Vec3 {
 		return res;
 	}
 
-	copy(v) {
+	from(v) {
 		for (let i = 0; i < 3; ++i) {
 			this.el[i] = v.el[i];
 		}
 		return this;
 	}
 
-	static copy(v) {
-		return (new Vec3()).copy(v);
+	static from(v) {
+		return (new Vec3()).from(v);
 	}
 
 	add(v0, v1) {
@@ -91,7 +91,7 @@ class Vec3 {
 	}
 
 	static scl(v, s) {
-		return Vec3.copy(v).scl(s);
+		return Vec3.from(v).scl(s);
 	}
 
 	neg(v) {
@@ -103,7 +103,7 @@ class Vec3 {
 	}
 
 	static neg(v) {
-		return Vec3.copy(v).neg();
+		return Vec3.from(v).neg();
 	}
 
 	dot(v) {
@@ -140,7 +140,7 @@ class Vec3 {
 
 	normalize(v) {
 		if (v) {
-			this.copy(v);
+			this.from(v);
 		}
 
 		const m = this.mag;
@@ -151,7 +151,7 @@ class Vec3 {
 	}
 
 	static normalize(v) {
-		return Vec3.copy(v).normalize();
+		return Vec3.from(v).normalize();
 	}
 
 	cross(v0, v1) {
@@ -173,4 +173,135 @@ class Vec3 {
 	print() {
 		console.log(`[${this.x}. ${this.y}, ${this.z}]`);
 	}
+}
+
+function multiply4x4(res, a, b) {
+	res.fill(0.0);
+
+	for (let k = 0; k < 4; ++k) {
+		for (let i = 0; i < 4; ++i) {
+			let r = a[i*4 + k];
+			for (let j = 0; j < 4; ++j) {
+				res[i*4 + j] += r * b[k*4 + j];
+			}
+		}
+	}
+}
+
+class Transform {
+	constructor() {
+		this.el = new Float32Array(4 * 4);
+	}
+
+	to3x4() {
+		return null;
+	}
+	from3x4(x34) {}
+
+	zero() {
+		this.el.fill(0.0);
+	}
+	identity() {
+		this.zero();
+	}
+
+	makeScale(sx, sy, sz) {
+		this.identity();
+		this.e[0] = sx;
+		this.e[5] = sy;
+		this.e[10] = sz;
+		this.e[15] = 1.0;
+	}
+
+	set(...v) {
+		this.el.fill(0.0);
+		for (let i = 0; i < v.length; ++i) {
+			this.el[i] = v[i];
+		}
+		return this;
+	}
+
+	from(m) {
+		for (let i = 0; i < 4*4; ++i) {
+			this.e[i] = m.e[i];
+		}
+		return this;
+	}
+
+	setRow(i, x, y, z, w) {
+		const rb = i * 4;
+		this.el[rb] = x;
+		this.el[rb + 1] = y;
+		this.el[rb + 2] = z;
+		this.el[rb + 3] = w;
+		return this;
+	}
+
+	setRowVec(i, v, w) {
+		return this.setRow(i, v.x, v.y, v.z, w);
+	}
+
+	setColumn(i, x, y, z, w) {
+		this.el[i] = x;
+		this.el[i + 4] = y;
+		this.el[i + 8] = z;
+		this.el[i + 12] = w;
+	}
+
+	setColumnVec(i, v, w) {
+		return this.setColumn(i, v.x, v.y, v.z, w);
+	}
+
+	concat(t0, t1) {
+		const child = t1 ? t0.el : this.el;
+		const parent = t1? t1.el : t0.el;
+		const el = new Float32Array(4*4);
+		multiply4x4(el, child, parent);
+		this.el = el;
+		return this;
+	}
+
+	calcVec(v) {
+		x = v.x;
+		y = v.y;
+		z = v.z;
+
+		let vx = x * el[0*4 + 0] + y * el[1*4 + 0] + z * el[2*4 + 0];
+		let vy = x * el[0*4 + 1] + y * el[1*4 + 1] + z * el[2*4 + 1];
+		let vz = x * el[0*4 + 2] + y * el[1*4 + 2] + z * el[2*4 + 2];
+
+		return (new Vec3()).set(vx, vy, vz);
+	}
+
+	calcPoint(p) {
+		x = p.x;
+		y = p.y;
+		z = p.z;
+
+		let px = x * el[0*4 + 0] + y * el[1*4 + 0] + z * el[2*4 + 0] + el[3*4 + 0];
+		let py = x * el[0*4 + 1] + y * el[1*4 + 1] + z * el[2*4 + 1] + el[3*4 + 1];
+		let pz = x * el[0*4 + 2] + y * el[1*4 + 2] + z * el[2*4 + 2] + el[3*4 + 2];
+
+		return (new Vec3()).set(px, py, pz);
+	}
+
+	setRotFrame(ax, ay, az) {
+		setRowVec(0, ax, 0.0);
+		setRowVec(1, ay, 0.0);
+		setRowVec(2, az, 0.0);
+		setRow(3, 0.0, 0.0, 0.0, 1.0);
+	}
+
+
+}
+
+class Transform3x4 {
+	constructor() {
+		this.el = new Float32Array(3 * 4);
+	}
+
+	to4x4() {
+		return null;
+	}
+	from4x4(x44) {}
 }
