@@ -1,3 +1,11 @@
+function degToRad(d) {
+	return d * (Math.PI / 180.0);
+}
+
+function radToDeg(r) {
+	return r * (180.0 / Math.PI);
+}
+
 class Vec3 {
 
 	constructor() {
@@ -196,11 +204,13 @@ class Transform {
 	to3x4() {
 		return null;
 	}
+
 	from3x4(x34) {}
 
 	zero() {
 		this.el.fill(0.0);
 	}
+
 	identity() {
 		this.zero();
 	}
@@ -211,6 +221,52 @@ class Transform {
 		this.e[5] = sy;
 		this.e[10] = sz;
 		this.e[15] = 1.0;
+	}
+
+	makeRotateX(rx) {
+		this.identity();
+		const s = Math.sin(rx);
+		const c = Math.cos(rx);
+		this.setRow(1, 0.0, c, s, 0.0);
+		this.setRow(2, 0.0, -s, c, 0.0);
+
+		return this;
+	}
+
+	makeRotateY(ry) {
+		this.identity();
+		const s = Math.sin(ry);
+		const c = Math.cos(ry);
+		this.setRow(0, c, 0.0, -s, 0.0);
+		this.setRow(2, s, 0.0, c, 0.0);
+
+		return this;
+	}
+
+	makeRotateZ(rz) {
+		this.identity();
+		const s = Math.sin(rz);
+		const c = Math.cos(rz);
+		this.setRow(0, c, s, 0.0, 0.0);
+		this.setRow(1, -s, c, 0.0, 0.0);
+
+		return this;
+	}
+
+	makeRotateDegX(dx) {
+		return this.makeRotateX(degToRad(dx));
+	}
+
+	makeRotateDegX(dy) {
+		return this.makeRotateY(degToRad(dy));
+	}
+
+	makeRotateDegX(dz) {
+		return this.makeRotateZ(degToRad(dz));
+	}
+
+	setTranslation(x, y, z) {
+		return this.setRow(3, x, y, z, 1.0);
 	}
 
 	set(...v) {
@@ -250,6 +306,34 @@ class Transform {
 
 	setColumnVec(i, v, w) {
 		return this.setColumn(i, v.x, v.y, v.z, w);
+	}
+
+	transpose() {
+		let el = this.el;
+		for (let i = 0; i < 3; ++i) {
+			for (let j = i + 1; j < 4; ++j) {
+				let ij = i * 4 + j;
+				let ji = j * 4 + i;
+				let t = el[ij];
+				el[ij] = el[ji];
+				el[ji] = t;
+			}
+		}
+		return this;
+	}
+
+	transposeSR() {
+		let el = this.el;
+		for (let i = 0; i < 2; ++i) {
+			for (let j = i + 1; j < 3; ++j) {
+				let ij = i * 4 + j;
+				let ji = j * 4 + i;
+				let t = el[ij];
+				el[ij] = el[ji];
+				el[ji] = t;
+			}
+		}
+		return this;
 	}
 
 	concat(t0, t1) {
@@ -292,6 +376,34 @@ class Transform {
 		setRow(3, 0.0, 0.0, 0.0, 1.0);
 	}
 
+
+	makeView(pos, tgt, upVec) {
+		const up0 = upVec ? upVec : new Vec3().set(0.0, 1.0, 0.0);
+
+		let dir = new Vec3().sub(tgt, pos);
+		dir.normalize();
+
+		let side = Vec3.cross(up0, dir);
+		side.normalize();
+
+		let up = Vec3.cross(side, dir);
+
+		this.setColumnVec(0, side.neg(), 0.0);
+		this.setColumnVec(1, up.neg(), 0.0);	this.setTranslation(pos.neg())
+		this.setColumnVec(2, dir.neg(), 0.0);	this.setTranslation(pos.neg())
+		this.setTranslation(this.calcVec(pos.neg()));
+
+		return this;
+	}
+
+	print() {
+		console.log(`[`);
+		for (let i = 0; i < 4; ++i) {
+			console.log(`${this.el[i*4 + 0]}, ${this.el[i*4 + 1]}, ${this.el[i*4 + 2]}, ${this.el[i*4 + 3]}`);
+		}
+		console.log(`]`);
+
+	}
 
 }
 
