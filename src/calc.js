@@ -208,11 +208,16 @@ class Transform {
 	from3x4(x34) {}
 
 	zero() {
-		this.el.fill(0.0);
+		return this.el.fill(0.0);
 	}
 
 	identity() {
 		this.zero();
+		for (let i = 0; i < 4; ++i) {
+			this.e[i*4 + i] = 1.0;
+		}
+
+		return this;
 	}
 
 	makeScale(sx, sy, sz) {
@@ -221,6 +226,8 @@ class Transform {
 		this.e[5] = sy;
 		this.e[10] = sz;
 		this.e[15] = 1.0;
+
+		return this;
 	}
 
 	makeRotateX(rx) {
@@ -302,6 +309,8 @@ class Transform {
 		this.el[i + 4] = y;
 		this.el[i + 8] = z;
 		this.el[i + 12] = w;
+
+		return this;
 	}
 
 	setColumnVec(i, v, w) {
@@ -374,6 +383,8 @@ class Transform {
 		setRowVec(1, ay, 0.0);
 		setRowVec(2, az, 0.0);
 		setRow(3, 0.0, 0.0, 0.0, 1.0);
+
+		return this;
 	}
 
 
@@ -402,7 +413,6 @@ class Transform {
 			console.log(`${this.el[i*4 + 0]}, ${this.el[i*4 + 1]}, ${this.el[i*4 + 2]}, ${this.el[i*4 + 3]}`);
 		}
 		console.log(`]`);
-
 	}
 
 }
