@@ -108,12 +108,12 @@ class Model {
 			let offs = 3;
 			for (let k = 0; k < vtxAttribsOrder.length; ++k) {
 				let attrName = vtxAttribsOrder[k];
-				let attrVtxsz = attrOffsMap[attrName].sz;
+				let attrVtxSz = attrOffsMap[attrName].sz;
 				let attrDataOffs = attrOffsMap[attrName].offs;
-				for (let j = 0; j < attrVtxsz; ++j) {
+				for (let j = 0; j < attrVtxSz; ++j) {
 					vbufData[vtxBase + j + offs] = pntsVecData[attrDataOffs + i*3 + j];
 				}
-				offs += attrVtxsz;
+				offs += attrVtxSz;
 			}
 		}
 		return vbufData;
@@ -124,10 +124,11 @@ class Model {
 		if (!gl) return;
 		const stride = this.vtxDataSz * 4;
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbuf);
-		setVtxAttrib(prog.attrLocPos, 3, stride, 0);
-		setVtxAttrib(prog.attrLocNrm, 3, stride, 0);
-		setVtxAttrib(prog.attrLocRGB, 3, stride, 0);
-		setVtxAttrib(prog.attrLocTex, 2, stride, 0);
+		let offset = 0;
+		offset = setVtxAttrib(prog.attrLocPos, 3, stride, offset);
+		offset = setVtxAttrib(prog.attrLocNrm, 3, stride, offset);
+		offset = setVtxAttrib(prog.attrLocRGB, 3, stride, offset);
+		offset = setVtxAttrib(prog.attrLocTex, 2, stride, offset);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibuf);
 	}
