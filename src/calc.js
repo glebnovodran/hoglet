@@ -200,115 +200,6 @@ class Transform {
 	constructor() {
 		this.el = new Float32Array(4 * 4);
 	}
-/*
-	from3x4(x34) {
-		let e = x34.el;
-		for (let i = 0; i < 3 * 4;++i) {
-			this.el[i] = e[i];
-		}
-		this.setRow(0.0, 0.0, 0.0, 1.0);
-		return this.transpose();
-	}
-*/
-	from3x4(x34) {
-		let e = x34.el;
-
-		for (let i = 0; i < 3; ++i) {
-			for (let j = 0; j < 4; ++j) {
-				this.el[j*4 + i] = e[i*4 + j];
-			}
-		}
-
-		return this;
-	}
-
-	static from3x4(x34) {
-		return (new Transform()).from3x4(x34);
-	}
-
-	zero() {
-		return this.el.fill(0.0);
-	}
-
-	identity() {
-		this.zero();
-		for (let i = 0; i < 4; ++i) {
-			this.el[i*4 + i] = 1.0;
-		}
-
-		return this;
-	}
-
-	makeScale(sx, sy, sz) {
-		this.identity();
-		this.el[0] = sx;
-		this.el[5] = sy;
-		this.el[10] = sz;
-		this.el[15] = 1.0;
-
-		return this;
-	}
-
-	makeRotateX(rx) {
-		this.identity();
-		const s = Math.sin(rx);
-		const c = Math.cos(rx);
-		this.setRow(1, 0.0, c, s, 0.0);
-		this.setRow(2, 0.0, -s, c, 0.0);
-
-		return this;
-	}
-
-	makeRotateY(ry) {
-		this.identity();
-		const s = Math.sin(ry);
-		const c = Math.cos(ry);
-		this.setRow(0, c, 0.0, -s, 0.0);
-		this.setRow(2, s, 0.0, c, 0.0);
-
-		return this;
-	}
-
-	makeRotateZ(rz) {
-		this.identity();
-		const s = Math.sin(rz);
-		const c = Math.cos(rz);
-		this.setRow(0, c, s, 0.0, 0.0);
-		this.setRow(1, -s, c, 0.0, 0.0);
-
-		return this;
-	}
-
-	makeRotateDegX(dx) {
-		return this.makeRotateX(degToRad(dx));
-	}
-
-	makeRotateDegX(dy) {
-		return this.makeRotateY(degToRad(dy));
-	}
-
-	makeRotateDegX(dz) {
-		return this.makeRotateZ(degToRad(dz));
-	}
-
-	setTranslation(x, y, z) {
-		return this.setRow(3, x, y, z, 1.0);
-	}
-
-	set(...v) {
-		this.el.fill(0.0);
-		for (let i = 0; i < v.length; ++i) {
-			this.el[i] = v[i];
-		}
-		return this;
-	}
-
-	from(m) {
-		for (let i = 0; i < 4*4; ++i) {
-			this.el[i] = m.el[i];
-		}
-		return this;
-	}
 
 	setRow(i, x, y, z, w) {
 		const rb = i * 4;
@@ -336,8 +227,155 @@ class Transform {
 		return this.setColumn(i, v.x, v.y, v.z, w);
 	}
 
-	transpose() {
-		let el = this.el;
+	from3x4(x34) {
+		let el = x34.el;
+
+		for (let i = 0; i < 3; ++i) {
+			for (let j = 0; j < 4; ++j) {
+				this.el[j*4 + i] = el[i*4 + j];
+			}
+		}
+
+		return this;
+	}
+
+	static from3x4(x34) {
+		return (new Transform()).from3x4(x34);
+	}
+
+	zero() {
+		this.el.fill(0.0);
+		return this;
+	}
+
+	static zero() {
+		return (new Transform()).zero();
+	}
+
+	identity() {
+		this.zero();
+		for (let i = 0; i < 4; ++i) {
+			this.el[i*4 + i] = 1.0;
+		}
+
+		return this;
+	}
+
+	static identity() {
+		return (new Transform()).identity();
+	}
+
+	makeScale(sx, sy, sz) {
+		this.identity();
+		this.el[0] = sx;
+		this.el[5] = sy;
+		this.el[10] = sz;
+		this.el[15] = 1.0;
+
+		return this;
+	}
+
+	static makeScale(sx, sy, sz) {
+		return (new Transform()).makeScale(sx, sy, sz);
+	}
+
+	makeRotateX(rx) {
+		this.identity();
+		const s = Math.sin(rx);
+		const c = Math.cos(rx);
+		this.setRow(1, 0.0, c, s, 0.0);
+		this.setRow(2, 0.0, -s, c, 0.0);
+
+		return this;
+	}
+
+	static makeRotateX(rx) {
+		return (new Transform()).makeRotateX(rx);
+	}
+
+	makeRotateY(ry) {
+		this.identity();
+		const s = Math.sin(ry);
+		const c = Math.cos(ry);
+		this.setRow(0, c, 0.0, -s, 0.0);
+		this.setRow(2, s, 0.0, c, 0.0);
+
+		return this;
+	}
+
+	static makeRotateY(ry) {
+		return (new Transform()).makeRotateY(ry);
+	}
+
+	makeRotateZ(rz) {
+		this.identity();
+		const s = Math.sin(rz);
+		const c = Math.cos(rz);
+		this.setRow(0, c, s, 0.0, 0.0);
+		this.setRow(1, -s, c, 0.0, 0.0);
+
+		return this;
+	}
+
+	static makeRotateZ(rz) {
+		return (new Transform()).makeRotateZ(rz);
+	}
+
+	makeRotateDegX(dx) {
+		return this.makeRotateX(degToRad(dx));
+	}
+
+	static makeRotateDegX(dx) {
+		return (new Transform()).makeRotateDegX(dx);
+	}
+
+	makeRotateDegY(dy) {
+		return this.makeRotateY(degToRad(dy));
+	}
+
+	static makeRotateDegY(dy) {
+		return (new Transform()).makeRotateDegY(dy);
+	}
+
+	makeRotateDegZ(dz) {
+		return this.makeRotateZ(degToRad(dz));
+	}
+
+	static makeRotateDegZ(dz) {
+		return (new Transform()).makeRotateDegZ(dz);
+	}
+
+	setTranslation(x, y, z) {
+		return this.setRow(3, x, y, z, 1.0);
+	}
+
+	makeTranslation(x, y, z) {
+		this.identity();
+		this.setTranslation(x, y, z);
+		return this;
+	}
+
+	set(...v) {
+		this.el.fill(0.0);
+		for (let i = 0; i < v.length; ++i) {
+			this.el[i] = v[i];
+		}
+		return this;
+	}
+
+	from(xform) {
+		for (let i = 0; i < 4*4; ++i) {
+			this.el[i] = xform.el[i];
+		}
+		return this;
+	}
+
+	static from(xform) {
+		return (new Transform()).from(m);
+	}
+
+	transpose(xform) {
+		let el = xform ? xform.el : this.el;
 		for (let i = 0; i < 3; ++i) {
 			for (let j = i + 1; j < 4; ++j) {
 				let ij = i * 4 + j;
@@ -350,8 +388,12 @@ class Transform {
 		return this;
 	}
 
-	transposeSR() {
-		let el = this.el;
+	static transpose(xform) {
+		return (new Transform()).transpose(xform);
+	}
+
+	transposeSR(xform) {
+		let el = xform ? xform.el : this.el;
 		for (let i = 0; i < 2; ++i) {
 			for (let j = i + 1; j < 3; ++j) {
 				let ij = i * 4 + j;
@@ -371,6 +413,10 @@ class Transform {
 		multiply4x4(el, child, parent);
 		this.el = el;
 		return this;
+	}
+
+	static concat(t0, t1) {
+		return (new Transform()).concat(t0, t1);
 	}
 
 	calcVec(v) {
@@ -406,6 +452,9 @@ class Transform {
 		return this;
 	}
 
+	static setRotFrame(ax, ay, az) {
+		return (new Transform()).setRotFrame(ax, ay, az);
+	}
 
 	makeView(pos, tgt, upVec) {
 		const up0 = upVec ? upVec : new Vec3().set(0.0, 1.0, 0.0);
@@ -426,6 +475,10 @@ class Transform {
 		return this;
 	}
 
+	static makeView(pos, tgt, upVec) {
+		return (new Transform()).makeView(pos, tgt, upVec);
+	}
+
 	makeProjection(fovY, aspect, znear, zfar) {
 		let angle = 0.5 * fovY;
 		let cot = 1 / Math.tan(angle)
@@ -434,6 +487,11 @@ class Transform {
 		this.setRow(1, 0.0, cot, 0.0, 0.0);
 		this.setRow(2, 0.0, 0.0, -sclCoef, -1.0);
 		this.setRow(3, 0.0, 0.0, -sclCoef * znear, 0.0);
+		return this;
+	}
+
+	static makeProjection(fovY, aspect, znear, zfar) {
+		return (new Transform()).makeProjection(fovY, aspect, znear, zfar);
 	}
 
 	print() {
