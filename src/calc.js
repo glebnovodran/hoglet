@@ -200,12 +200,31 @@ class Transform {
 	constructor() {
 		this.el = new Float32Array(4 * 4);
 	}
+/*
+	from3x4(x34) {
+		let e = x34.el;
+		for (let i = 0; i < 3 * 4;++i) {
+			this.el[i] = e[i];
+		}
+		this.setRow(0.0, 0.0, 0.0, 1.0);
+		return this.transpose();
+	}
+*/
+	from3x4(x34) {
+		let e = x34.el;
 
-	to3x4() {
-		return null;
+		for (let i = 0; i < 3; ++i) {
+			for (let j = 0; j < 4; ++j) {
+				this.el[j*4 + i] = e[i*4 + j];
+			}
+		}
+
+		return this;
 	}
 
-	from3x4(x34) {}
+	static from3x4(x34) {
+		return (new Transform()).from3x4(x34);
+	}
 
 	zero() {
 		return this.el.fill(0.0);
@@ -214,7 +233,7 @@ class Transform {
 	identity() {
 		this.zero();
 		for (let i = 0; i < 4; ++i) {
-			this.e[i*4 + i] = 1.0;
+			this.el[i*4 + i] = 1.0;
 		}
 
 		return this;
@@ -222,10 +241,10 @@ class Transform {
 
 	makeScale(sx, sy, sz) {
 		this.identity();
-		this.e[0] = sx;
-		this.e[5] = sy;
-		this.e[10] = sz;
-		this.e[15] = 1.0;
+		this.el[0] = sx;
+		this.el[5] = sy;
+		this.el[10] = sz;
+		this.el[15] = 1.0;
 
 		return this;
 	}
@@ -286,7 +305,7 @@ class Transform {
 
 	from(m) {
 		for (let i = 0; i < 4*4; ++i) {
-			this.e[i] = m.e[i];
+			this.el[i] = m.el[i];
 		}
 		return this;
 	}
@@ -407,6 +426,16 @@ class Transform {
 		return this;
 	}
 
+	makeProjection(fovY, aspect, znear, zfar) {
+		let angle = 0.5 * fovY;
+		let cot = 1 / Math.tan(angle)
+		let sclCoef = zfar / (zfar - znear);
+		this.setRow(0, cot / aspect, 0.0, 0.0, 0.0);
+		this.setRow(1, 0.0, cot, 0.0, 0.0);
+		this.setRow(2, 0.0, 0.0, -sclCoef, -1.0);
+		this.setRow(3, 0.0, 0.0, -sclCoef * znear, 0.0);
+	}
+
 	print() {
 		console.log(`[`);
 		for (let i = 0; i < 4; ++i) {
@@ -422,8 +451,23 @@ class Transform3x4 {
 		this.el = new Float32Array(3 * 4);
 	}
 
-	to4x4() {
-		return null;
+	from4x4(x44) {
+		let m = x44.transpose();
+		for (let i = 0; i < 3 * 4; ++i) {
+			this.el[i] = m.el[i];
+		}
+		return this;
 	}
-	from4x4(x44) {}
+
+	static from4x4(x44) {
+		return (new Transform3x4()).from4x4(x44);
+	}
+
+	print() {
+		console.log(`[`);
+		for (let i = 0; i < 3; ++i) {
+			console.log(`${this.el[i*4 + 0]}, ${this.el[i*4 + 1]}, ${this.el[i*4 + 2]}, ${this.el[i*4 + 3]}`);
+		}
+		console.log(`]`);
+	}
 }
