@@ -5,6 +5,15 @@ class Material {
 		this.id = -1;
 		this.org = 0;
 		this.ntri = 0;
+		this.vao = 0;
+	}
+}
+
+class Batch {
+	constructor() {		
+		this.mtl = null;
+		this.offset = 0;
+		this.ntri = 0;
 	}
 }
 
@@ -58,6 +67,13 @@ class Model {
 			this.mtls[i].path = jsonObj.mtlPaths[i];
 			this.mtls[i].org = mtlIBOffs[i];
 			this.mtls[i].ntri = mtlTriCnt[i];
+		}
+
+		this.batches = new Array(this.nmtl);
+		for (let i = 0; i < this.nmtl; ++i) {
+			this.batches[i].mtl = this.mtls[i];
+			this.offset = 0;
+			this.ntri = this.mtls[i].ntri;
 		}
 
 		this.vbuf = gl.createBuffer();

@@ -42,13 +42,16 @@ function setVtxAttrib(loc, nelems, stride, offs) {
 
 
 class GPUProg {
-	constructor(progInfo) {
+
+	constructor(name, progInfo) {
+		this.name = name;
 		this.vert = null;
 		this.frag = null;
 		this.prog = null;
 		this.nattr = 0;
 		this.nparm = 0;
 		this.nsamp = 0;
+		this.vtxDesc = { names : [], sizes: []};
 
 		const gl = drawWebGL2.gl;
 
@@ -84,6 +87,8 @@ class GPUProg {
 						this.nattr = progInfo.attrs.length;
 						this.nparm = progInfo.gpblocks.length;
 						this.nsamp = progInfo.samplers.length;
+						this.vtxDesc.names = progInfo.attrs;
+						this.vtxDesc.sizes = progInfo.attrSizes;
 
 						for (const attr of progInfo.attrs) {
 							this[`attrLoc${attr}`] = gl.getAttribLocation(this.prog, `vtx${attr}`);
@@ -146,9 +151,9 @@ class Draw {
 	}
 
 	initGPUProgs() {
-		var gpuSolidUnlit = new GPUProg(solid_unlit_prog);
+		var gpuSolidUnlit = new GPUProg("solid_unlit_prog", solid_unlit_prog);
 		if (gpuSolidUnlit.valid()) {
-			this.progs["solid_unlit_prog"] = gpuSolidUnlit;
+			this.progs[gpuSolidUnlit.name] = gpuSolidUnlit;
 		}
 	}
 }
