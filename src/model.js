@@ -1,4 +1,4 @@
-const vtxAttribsOrder = ["N", "Cd", "uv"];
+//const vtxAttribsOrder = ["N", "Cd", "uv"];
 class Material {
 	constructor() {
 		this.path = "";
@@ -10,7 +10,7 @@ class Material {
 }
 
 class Batch {
-	constructor() {		
+	constructor() {
 		this.mtl = null;
 		this.offset = 0;
 		this.ntri = 0;
@@ -31,7 +31,8 @@ class Model {
 		this.nmtl = jsonObj.nmtl;
 		this.hasSkin = false;
 
-		const vbufData = Model.getVBData(jsonObj);
+		const gpuProg = this.getProg(this.hasSkin);
+		const vbufData = Model.getVBData(jsonObj, gpuProg.vtxDesc);
 
 		const mtlTriCnt = new Uint16Array(this.nmtl);
 		mtlTriCnt.fill(0);
@@ -71,9 +72,10 @@ class Model {
 
 		this.batches = new Array(this.nmtl);
 		for (let i = 0; i < this.nmtl; ++i) {
+			this.batches[i] = new Batch();
 			this.batches[i].mtl = this.mtls[i];
-			this.offset = 0;
-			this.ntri = this.mtls[i].ntri;
+			this.batches[i].offset = 0;
+			this.batches[i].ntri = this.mtls[i].ntri;
 		}
 
 		this.vbuf = gl.createBuffer();
@@ -93,39 +95,46 @@ class Model {
 
 	}
 
-	static getVBData(jsonObj) {
-		let attrOffsMap = {
-			"N" : {"offs" : -1, "sz" : 3},
-			"Cd" : {"offs" : -1, "sz" : 3},
-			"uv" : {"offs" : -1, "sz" : 2}
+	static getVBData(jsonObj, vtxDesc) {
+		if (!vtxDesc || !jsonObj) return null;
+
+		const attrOffsMap = {
+			"Nrm"  : {"name" : "N", "offs" : -1},
+			"RGB" : {"name" : "Cd", "offs" : -1},
+			"Tex" : {"name" : "uv", "offs" : -1}
 		};
 
-		const vecAttrSz = attrOffsMap.N.sz + attrOffsMap.Cd.sz + attrOffsMap.uv.sz;
-		const vtxDataSz = 3 + vecAttrSz; // pos, N, Cd, uv
-		this.vtxDataSz = vtxDataSz;
-
 		for (const attrName in attrOffsMap) {
-			const idx = jsonObj.pntVecAttrNames.findIndex((element) => element === attrName);
+			//if (attrOffsMap.hasOwnProperty(attrName))
+			const jsonAttrName = attrOffsMap[attrName].name;
+			const idx = jsonObj.pntVecAttrNames.findIndex((element) => element === jsonAttrName);
 			if (idx < 0) {
 				console.error("Can't find attribute :", attrName);
 				return;
 			}
-			attrOffsMap[attrName].offs = this.npnt * idx * 3;
+			attrOffsMap[attrName].offs = jsonObj.npnt * idx * 3;
 		}
 
-		const vbufData = new Float32Array(this.npnt * vtxDataSz);
+		const vtxDataSz = vtxDesc.dataSize;
+
+		const vbufData = new Float32Array(jsonObj.npnt * vtxDataSz);
 		const pntsPos = jsonObj.pnts;
 		const pntsVecData = jsonObj.pntsVecData;
-		for (let i = 0; i < this.npnt; ++i) {
-			let vtxBase = i * vtxDataSz;
+
+		for (let i = 0; i < jsonObj.npnt; ++i) {
+			const vtxBase = i * vtxDataSz;
 			vbufData[vtxBase + 0] = pntsPos[i * 3 + 0];
 			vbufData[vtxBase + 1] = pntsPos[i * 3 + 1];
 			vbufData[vtxBase + 2] = pntsPos[i * 3 + 2];
 			let offs = 3;
-			for (let k = 0; k < vtxAttribsOrder.length; ++k) {
-				let attrName = vtxAttribsOrder[k];
-				let attrVtxSz = attrOffsMap[attrName].sz;
-				let attrDataOffs = attrOffsMap[attrName].offs;
+			for (let k = 0; k < vtxDesc.names.length; ++k) {
+				const attrName = vtxDesc.names[k];
+
+				const jsonAttrInfo = attrOffsMap[attrName];
+				if (!jsonAttrInfo) continue;
+
+				const attrVtxSz = vtxDesc.sizes[k];
+				const attrDataOffs = jsonAttrInfo.offs;
 				for (let j = 0; j < attrVtxSz; ++j) {
 					vbufData[vtxBase + j + offs] = pntsVecData[attrDataOffs + i*3 + j];
 				}
@@ -133,6 +142,10 @@ class Model {
 			}
 		}
 		return vbufData;
+	}
+
+	getProg(hasSkin, mtl) {
+		return drawWebGL2.getProg("solid_unlit_prog");
 	}
 
 	bindBuffers(prog) {
@@ -150,6 +163,6 @@ class Model {
 	}
 
 	draw(prog) {
-
+		//"solid_unlit_prog"
 	}
 }

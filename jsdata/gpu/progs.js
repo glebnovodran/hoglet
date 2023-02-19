@@ -63,11 +63,11 @@ var solid_unlit_prog = {
 	 vs:{ name: "shader_solid_vert", src:shader_solid_vert },
 	 fs:{ name: "shader_unlit_frag", src:shader_unlit_frag },
 	 attrs:
-		["Pos","Nrm","RGB","Tex"],
+		["Pos", "Nrm", "RGB", "Tex"],
 	 attrSizes:
-		["3","3","3","2"],
+		[3, 3, 3, 2],
 	 gpblocks:
-		["Xform","Scene","Model"],
+		["Xform", "Scene", "Model"],
 	 samplers:
 		[],
 }
