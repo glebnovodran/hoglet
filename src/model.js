@@ -1,11 +1,9 @@
-//const vtxAttribsOrder = ["N", "Cd", "uv"];
 class Material {
 	constructor() {
 		this.path = "";
 		this.id = -1;
 		this.org = 0;
 		this.ntri = 0;
-		this.vao = 0;
 	}
 }
 
@@ -90,8 +88,33 @@ class Model {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibuf);
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibufData, gl.STATIC_DRAW);
 
+		this.vao = null;
+		this.prepareVAO(gpuProg);
+	}
+
+	prepareVAO(gpuProg) {
+		const gl = drawWebGL2.gl;
+		this.vao = gl.createVertexArray();
+		gl.bindVertexArray(this.vao);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbuf);
+
+		const stride = gpuProg.vtxDesc.dataSize * 4;
+
+		let offset = 0;
+		const nattr = gpuProg.vtxDesc.names.length;
+		for (let i = 0; i < nattr; ++i) {
+			const attrLoc = gpuProg[`attrLoc${attr}`];
+			const attrSz = gpuProg.vtxDesc.sizes[i];
+			offset = setVtxAttrib(attrLoc, attrSz, stride, offset);
+		}
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibuf);
+		gl.bindVertexArray(null);
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+		if (!gl.isVertexArray(this.vao)) {
+			console.error("Invalid VAO");
+		}
 
 	}
 
@@ -105,7 +128,6 @@ class Model {
 		};
 
 		for (const attrName in attrOffsMap) {
-			//if (attrOffsMap.hasOwnProperty(attrName))
 			const jsonAttrName = attrOffsMap[attrName].name;
 			const idx = jsonObj.pntVecAttrNames.findIndex((element) => element === jsonAttrName);
 			if (idx < 0) {
@@ -148,21 +170,7 @@ class Model {
 		return drawWebGL2.getProg("solid_unlit_prog");
 	}
 
-	bindBuffers(prog) {
-		const gl = drawWebGL2.gl;
-		if (!gl) return;
-		const stride = this.vtxDataSz * 4;
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbuf);
-		let offset = 0;
-		offset = setVtxAttrib(prog.attrLocPos, 3, stride, offset);
-		offset = setVtxAttrib(prog.attrLocNrm, 3, stride, offset);
-		offset = setVtxAttrib(prog.attrLocRGB, 3, stride, offset);
-		offset = setVtxAttrib(prog.attrLocTex, 2, stride, offset);
-
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibuf);
-	}
-
-	draw(prog) {
-		//"solid_unlit_prog"
+	draw() {
+		
 	}
 }

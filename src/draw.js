@@ -96,7 +96,10 @@ class GPUProg {
 						this.vtxDesc.sizes = progInfo.attrSizes;
 
 						for (const attr of progInfo.attrs) {
+							console.log(`attrLoc${attr}`);
 							this[`attrLoc${attr}`] = gl.getAttribLocation(this.prog, `vtx${attr}`);
+							console.log(`vtx${attr}`);
+							console.log(this[`attrLoc${attr}`]);
 						}
 
 						for (const gpblock of progInfo.gpblocks) {
