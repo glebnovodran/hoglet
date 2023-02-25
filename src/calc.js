@@ -1,9 +1,20 @@
+/* SPDX-License-Identifier: MIT */
+/* SPDX-FileCopyrightText: 2023 Glib Novodran <novodran@gmail.com> */
+
 function degToRad(d) {
 	return d * (Math.PI / 180.0);
 }
 
 function radToDeg(r) {
 	return r * (180.0 / Math.PI);
+}
+
+function div0(x, y) {
+	y === 0.0 ? 0.0 : x / y;
+}
+
+function rcp0(val) {
+	return val === 0.0 ? 0.0 : 1.0 / val;
 }
 
 class Vec3 {
