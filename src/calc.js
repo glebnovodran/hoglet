@@ -479,10 +479,9 @@ class Transform {
 		return (new Transform()).makeView(pos, tgt, upVec);
 	}
 
-	makeProjection(fovY, aspect, znear, zfar) {
-		let angle = 0.5 * fovY;
-		let cot = 1 / Math.tan(angle)
-		let sclCoef = zfar / (zfar - znear);
+	makeProjection(halfFOVY, aspect, znear, zfar) {
+		const cot = 1 / Math.tan(halfFOVY)
+		const sclCoef = zfar / (zfar - znear);
 		this.setRow(0, cot / aspect, 0.0, 0.0, 0.0);
 		this.setRow(1, 0.0, cot, 0.0, 0.0);
 		this.setRow(2, 0.0, 0.0, -sclCoef, -1.0);
@@ -490,8 +489,8 @@ class Transform {
 		return this;
 	}
 
-	static makeProjection(fovY, aspect, znear, zfar) {
-		return (new Transform()).makeProjection(fovY, aspect, znear, zfar);
+	static makeProjection(halfFOVY, aspect, znear, zfar) {
+		return (new Transform()).makeProjection(halfFOVY, aspect, znear, zfar);
 	}
 
 	print() {
