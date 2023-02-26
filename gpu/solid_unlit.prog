@@ -2,4 +2,4 @@ solid.vert
 unlit.frag
 Pos Nrm RGB Tex
 3 3 3 2
-Xform Scene Model
+World Scene Model Material

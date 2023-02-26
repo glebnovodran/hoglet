@@ -16,7 +16,7 @@ var shader_solid_vert =
 	"out vec3 pixRGB;\n" +
 	"out vec2 pixTex;\n" +
 	"\n" +
-	"layout(std140) uniform GPXform {\n" +
+	"layout(std140) uniform GPWorld {\n" +
 	"\tmat4 gpWorld;\n" +
 	"};\n" +
 	"\n" +
@@ -48,7 +48,11 @@ var shader_unlit_frag =
 	"out vec4 outClr;\n" +
 	"\n" +
 	"layout(std140) uniform GPModel { \n" +
-	"\tvec3 prmBaseColor;\n" +
+	"\tvec3 gpBaseColor;\n" +
+	"};\n" +
+	"\n" +
+	"layout(std140) uniform GPMaterial { \n" +
+	"\tvec3 gpMtlDiffColor;\n" +
 	"};\n" +
 	"\n" +
 	"void main() {\n" +
@@ -67,7 +71,7 @@ var solid_unlit_prog = {
 	 attrSizes:
 		[3, 3, 3, 2],
 	 gpblocks:
-		["Xform", "Scene", "Model"],
+		["World", "Scene", "Model", "Material"],
 	 samplers:
 		[],
 }

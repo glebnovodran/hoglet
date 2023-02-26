@@ -10,7 +10,11 @@ in vec2 pixTex;
 out vec4 outClr;
 
 layout(std140) uniform GPModel { 
-	vec3 prmBaseColor;
+	vec3 gpBaseColor;
+};
+
+layout(std140) uniform GPMaterial { 
+	vec3 gpMtlDiffColor;
 };
 
 void main() {

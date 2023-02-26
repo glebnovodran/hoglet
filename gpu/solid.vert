@@ -12,7 +12,7 @@ out vec3 pixNrm;
 out vec3 pixRGB;
 out vec2 pixTex;
 
-layout(std140) uniform GPXform {
+layout(std140) uniform GPWorld {
 	mat4 gpWorld;
 };
 
