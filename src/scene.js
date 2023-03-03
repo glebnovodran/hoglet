@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT */
+/* SPDX-FileCopyrightText: 2023 Glib Novodran <novodran@gmail.com> */
+
 class SCENE {
 	constructor() {
 	}
@@ -9,6 +12,11 @@ class SCENE {
 				this.loadModel(entry.name, entry.str);
 			}
 		}
+		const w = drawWebGL2.canvas.width;
+		const h = drawWebGL2.canvas.height;
+		this.cam = new Camera(w, h);
+		this.drawCtx = new DrawContext();
+		this.drawCtx.cam = this.cam;
 	}
 
 	loadModel(name, jsonStr) {
@@ -24,6 +32,15 @@ class SCENE {
 		return this.models[name];
 	}
 
+	exec() {
+
+	}
+
+	draw() {
+		for (const mdl in this.models) {
+			mdl.draw(this.drawCtx);
+		}
+	}
 
 }
 

@@ -1,17 +1,18 @@
-class Material {
+/* SPDX-License-Identifier: MIT */
+/* SPDX-FileCopyrightText: 2023 Glib Novodran <novodran@gmail.com> */
+
+class MaterialParam {
 	constructor() {
-		this.path = "";
-		this.id = -1;
-		this.org = 0;
-		this.ntri = 0;
+		this.diffClr = new Vec3(1.0, 1.0, 1.0);
 	}
 }
-
-class Batch {
+class MaterialBatch {
 	constructor() {
-		this.mtl = null;
-		this.offset = 0;
+		this.path = "";
+		this.mtlId = -1;
+		this.org = 0;
 		this.ntri = 0;
+		this.ubo = -1;
 	}
 }
 
@@ -22,14 +23,14 @@ class Model {
 		if (!gl) return;
 
 		if (!jsonObj || jsonObj.dataType != "geo") return;
-		if (!jsonObj.pnts || !jsonObj.pntsVecData) return; // ?
+		if (!jsonObj.pnts || !jsonObj.pntsVecData) return;
 
 		this.npnt = jsonObj.npnt;
 		this.ntri = jsonObj.ntri;
 		this.nmtl = jsonObj.nmtl;
 		this.hasSkin = false;
 
-		const gpuProg = this.getProg(this.hasSkin);
+		const gpuProg = this.selectProg(this.hasSkin);
 		const vbufData = Model.getVBData(jsonObj, gpuProg.vtxDesc);
 
 		const mtlTriCnt = new Uint16Array(this.nmtl);
@@ -59,21 +60,13 @@ class Model {
 			idxOffs[mtlId] = pos;
 		}
 
-		this.mtls = new Array(this.nmtl);
-		for (let i = 0; i < this.nmtl; ++i) {
-			this.mtls[i] = new Material();
-			this.mtls[i].id = i;
-			this.mtls[i].path = jsonObj.mtlPaths[i];
-			this.mtls[i].org = mtlIBOffs[i];
-			this.mtls[i].ntri = mtlTriCnt[i];
-		}
-
 		this.batches = new Array(this.nmtl);
 		for (let i = 0; i < this.nmtl; ++i) {
-			this.batches[i] = new Batch();
-			this.batches[i].mtl = this.mtls[i];
-			this.batches[i].offset = 0;
-			this.batches[i].ntri = this.mtls[i].ntri;
+			this.batches[i] = new MaterialBatch();
+			this.batches[i].mtlId = i;
+			this.batches[i].path = jsonObj.mtlPaths[i];
+			this.batches[i].org = mtlIBOffs[i];
+			this.batches[i].ntri = mtlTriCnt[i];
 		}
 
 		this.vbuf = gl.createBuffer();
@@ -115,7 +108,6 @@ class Model {
 		if (!gl.isVertexArray(this.vao)) {
 			console.error("Invalid VAO");
 		}
-
 	}
 
 	static getVBData(jsonObj, vtxDesc) {
@@ -166,11 +158,27 @@ class Model {
 		return vbufData;
 	}
 
-	getProg(hasSkin, mtl) {
+	selectProg(hasSkin, mtlBatch) {
 		return drawWebGL2.getProg("solid_unlit_prog");
 	}
 
-	draw() {
-		
+	draw_batch(ibatch, ctx) {
+		const gl = drawWebGL2.gl;
+
+		if (ibatch >= this.batches.length) return;
+
+		const batch = this.batches[ibatch];
+		const prog = this.selectProg(this.hasSkin, batch);
+		if (!prog) return;
+		if (!prog.valid()) return;
+
+		const cam = scene.cam;
+		prog.use();
+		gl.bindVertexArray(this.vao);
+
+	}
+
+	draw(ctx) {
+		if (!ctx) return;
 	}
 }

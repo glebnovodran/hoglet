@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: MIT */
+/* SPDX-FileCopyrightText: 2023 Glib Novodran <novodran@gmail.com> */
+
 function compileShader(src, type) {
 	let s = null;
 	const gl = drawWebGL2.gl;
@@ -133,17 +136,18 @@ class Draw {
 	constructor() {
 		this.shaders = {};
 		this.progs = {};
+		this.canvas = null;
 	}
 
 	init(canvasId) {
-		const canvas = document.getElementById(canvasId);
-		if (!canvas) {
+		this.canvas = document.getElementById(canvasId);
+		if (this.canvas) {
 			console.error("Canvas not found.");
 			return;
 		}
 		this.gl = null;
 		try {
-			this.gl = canvas.getContext("webgl2", {
+			this.gl = this.canvas.getContext("webgl2", {
 				antialias: true,
 				depth: true,
 				alpha: true,
@@ -167,6 +171,12 @@ class Draw {
 
 	getProg(progName) {
 		return this.progs[progName];
+	}
+}
+
+class DrawContext {
+	constructor() {
+		this.cam = null;
 	}
 }
 
